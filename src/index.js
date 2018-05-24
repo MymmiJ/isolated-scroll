@@ -8,9 +8,12 @@ const calculateHeight = el => {
 };
 
 // Source adapted from: http://stackoverflow.com/a/16324762
-const makeHandler = el => event => {
+const makeHandler = (el, {maxScrollSpeed}) => event => {
   const { scrollTop, scrollHeight } = el;
-  const { type, detail, wheelDelta } = event;
+  const { type, detail } = event;
+  const wheelDelta = event.wheelDelta > maxScrollSpeed ? maxScrollSpeed :
+                      event.wheelDelta < -maxScrollSpeed ? -maxScrollSpeed :
+                      event.wheelDelta;
   const height = calculateHeight(el);
   const delta = (type === 'DOMMouseScroll' ? detail * -40 : wheelDelta);
   const up = delta > 0;
@@ -32,8 +35,8 @@ const makeHandler = el => event => {
   }
 };
 
-export default el => {
-  const handler = makeHandler(el);
+export default (el, options = {maxScrollSpeed : 100} ) => {
+  const handler = makeHandler(el, options);
 
   const addEvent = (el.addEventListener || el.attachEvent).bind(el);
   const removeEvent = (el.removeEventListener || el.detachEvent).bind(el);
